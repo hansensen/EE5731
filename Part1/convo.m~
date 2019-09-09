@@ -1,0 +1,49 @@
+function outputImage = convo(image, kernel)
+    image = double(image);
+
+    % Get the height and width of the image
+    imageH = size(image, 1);
+    imageW = size(image, 2);
+    
+    % Get the height and width of the kernel
+    kernelH = size(kernel, 1);
+    kernelW = size(kernel, 2);
+
+    for i = 1 : imageH - kernelH + 1
+        for j = 1 : imageW - kernelW + 1
+            targetArea = image(i:i + kernelH - 1, j: j + kernelW - 1);
+            for k = 1 : kernelH
+                for l = 1 : kernelW
+                    targetArea(k, l) = targetArea(k, l) *
+                end
+            end
+        end
+    end
+
+    outputImage = conv2(double(image), kernel, 'same');
+end
+
+
+% function [ lenaOutput] = sobel(X)
+% %X input color image
+% X= double(X); height = size(X, 1); width = size(X, 2); channel = size(X, 3);
+% lenaOutput = X;
+% Gx = [1 +2 +1; 0 0 0; -1 -2 -1]; Gy = Gx';
+% for i = 2 : height-1
+%    for j = 2 : width-1
+%        for k = 1 : channel
+%            tempLena = X(i - 1 : i + 1, j - 1 : j + 1, k);
+%            a=(sum(Gx.* tempLena));
+%            x = sum(a);
+%            b= (sum(Gy.* tempLena));
+%             y = sum(b);
+%            pixValue =sqrt(x.^2+ y.^2);
+%           % pixValue =(x-y);
+%            lenaOutput(i, j, k) = pixValue;
+%        end 
+%    end
+% end
+% lenaOutput = uint8(lenaOutput); 
+% figure; 
+% imshow(abs(lenaOutput),[]); 
+% title(' Sobel Edge Detection');
