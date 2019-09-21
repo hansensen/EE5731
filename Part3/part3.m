@@ -37,11 +37,15 @@ for i = 1 : point_num
 end
 
 % Decompose matrix A using SVD
-[U,DSSS,V] = svd(A);
-h = V(end,:);
+[U,D,V] = svd(A);
+h = V(:, end)';
 H = zeros(3, 3);
 
 % Construct H matrix
 for i = 1 : 3
     H(i, :) = h(:, i*3-2:i*3);
 end
+
+figure;
+tform = projective2d(H.');
+imshow(imwarp(image2, tform))
