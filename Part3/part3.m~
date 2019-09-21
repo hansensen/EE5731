@@ -1,0 +1,7 @@
+image1 = double(rgb2gray(imread('h1.jpg')));
+image2 = double(rgb2gray(imread('h2.jpg')));
+
+image_size = 2;
+
+for i = 1 to image_size
+    
