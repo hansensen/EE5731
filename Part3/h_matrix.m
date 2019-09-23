@@ -20,7 +20,7 @@ function H = h_matrix(keypoint1, keypoint2)
     end
 
     % Decompose matrix A using SVD
-    [U,D,V] = svd(A);
+    [~,~,V] = svd(A);
     h = V(:, end)';
     H = zeros(3, 3);
 
