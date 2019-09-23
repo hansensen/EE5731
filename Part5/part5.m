@@ -13,7 +13,8 @@ keypoints = cell(1,length(images));
 
 keyPoints1 = SIFT(image1,5,5,1.6);
 keyPoints2 = SIFT(image2,5,5,1.6);
-matchedPoints1 = cell(length(keyPoints1));
+matchedKP1 = keyPoints1;
+matchedKP2 = cell(length(keyPoints1));
 
 for i = 1:length(keyPoints1)
     minDist = sqrt(sum((keyPoints1{i}.Descriptor - keyPoints2{1}.Descriptor).^2));
@@ -25,7 +26,7 @@ for i = 1:length(keyPoints1)
             bestMatch = j;
         end
     end
-    matchedPoints1{i} = keyPoints2{bestMatch};
+    matchedKP2{i} = keyPoints2{bestMatch};
 end
 
 % Check if all the key points are correct
@@ -43,8 +44,8 @@ matchedPointsIn2 = zeros(length(keyPoints1),2);
 for i = 1 : length(keyPoints1)
     matchedPointsIn1(i,1) = keyPoints1{i}.Coordinates(2);
     matchedPointsIn1(i,2) = keyPoints1{i}.Coordinates(1);
-    matchedPointsIn2(i,1) = matchedPoints1{i}.Coordinates(2);
-    matchedPointsIn2(i,2) = matchedPoints1{i}.Coordinates(1);
+    matchedPointsIn2(i,1) = matchedKP2{i}.Coordinates(2);
+    matchedPointsIn2(i,2) = matchedKP2{i}.Coordinates(1);
 end
 
 % Plot all the matches
@@ -55,4 +56,4 @@ legend(ax, 'Matched points 1','Matched points 2');
 
 %% Step 2 - Get the Best Homography Matrix Using RANSAC
 
-H_RANSAC = RANSAC(matchedPointsIn1, matchedPointsIn2, image2);
+H_RANSAC = RANSAC(matchedKP1, matchedKP2, image1, image2);
