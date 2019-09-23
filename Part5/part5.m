@@ -28,7 +28,7 @@ for i = 1:length(keyPoints1)
     matchedPoints1{i} = keyPoints2{bestMatch};
 end
 
-
+% Check if all the key points are correct
 % image2Figure = SIFTKeypointVisualizer(image2,matchedPoints1);
 % figure;
 % imshow(uint8(image2Figure));
@@ -47,54 +47,12 @@ for i = 1 : length(keyPoints1)
     matchedPointsIn2(i,2) = matchedPoints1{i}.Coordinates(1);
 end
 
+% Plot all the matches
 figure; ax = axes;
 showMatchedFeatures(image1,image2,matchedPointsIn1,matchedPointsIn2,'montage','Parent',ax);
 title(ax, 'Candidate point matches');
 legend(ax, 'Matched points 1','Matched points 2');
 
-%% Step 2 - Compute the homography matrix using SVD and transformation structure
-% 
-% % H = homography_matrix(keypoint_in, keypoint_out)
-% H_21 = h_matrix(keypoints{1}, keypoints{2});
-% 
-% tforms(length(images)) = projective2d(eye(3));
-% tforms(2) = projective2d(H_21.');
-% 
-% %% Step 3 - Compute the output limits and create the corresponding panaroma
-% 
-% % Compute the output limits  for each transform
-% for i = 1:length(tforms)
-%     % [xLimitsOut,yLimitsOut] = outputLimits(tform,xLimitsIn,yLimitsIn)
-%     [xlim(i,:), ylim(i,:)] = outputLimits(tforms(i), [1 image_size(i, 2)], [1 image_size(i, 1)]);    
-% end
-% 
-% max_image_size = max(image_size);
-% 
-% % Find the minimum and maximum output limits 
-% xMin = min([1; xlim(:)]);
-% xMax = max([max_image_size(2); xlim(:)]);
-% 
-% yMin = min([1; ylim(:)]);
-% yMax = max([max_image_size(1); ylim(:)]);
-% 
-% % Width and height of panorama.
-% width  = round(xMax - xMin);
-% height = round(yMax - yMin);
-% 
-% % Create a 2-D spatial reference object defining the size of the panorama
-% xLimits = [xMin xMax];
-% yLimits = [yMin yMax];
-% panorama_view = imref2d([height width], xLimits, yLimits);
-% 
-% warped_images = cell(1,length(images));
-% 
-% % Create the panorama
-% for i = 1:length(images)
-%     image = images{i};   
-%     % Transform I into the panorama
-%     warped_images{i} = imwarp(image, tforms(i), 'OutputView', panorama_view);          
-% end
-% 
-% 
-% figure
-% imshow(warped_images{1} + warped_images{2})
+%% Step 2 - Get the Best Homography Matrix Using RANSAC
+
+H_RANSAC = RANSAC(matchedPointsIn1, matchedPointsIn2, image2);
