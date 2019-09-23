@@ -1,4 +1,5 @@
-function inliers = getInliers(matchedPointsIn1, matchedPointsIn2, H, threshold)
+function [numInliers, inliers] = getInliers(matchedPointsIn1, matchedPointsIn2, H, threshold)
+    inliers = [];
     transformedPoints = transform(matchedPointsIn2, H);
     numInliers = 0;
     for i = 1:length(matchedPointsIn1)
