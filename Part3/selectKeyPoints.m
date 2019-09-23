@@ -1,5 +1,5 @@
 function keypoints = selectKeyPoints(im, n_pts)
-    keypoints = cell(1,2);
+    keypoints = cell(1,length(im));
     % Get keypoints
     for i = 1 : length(im)
         figure;
