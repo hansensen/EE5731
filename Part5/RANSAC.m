@@ -1,33 +1,62 @@
-function A_ransac = RANSAC(matchedPointsIn1,matchedPointsIn2, image2)
+function bestH = RANSAC(matchedKP1,matchedKP2, image1, image2)
     %% Intialization
-    N_pts = length(matchedPointsIn1); % total no. of points
+    N_pts = length(matchedKP1); % total no. of points
+    threshold = 50;
     k = 5; %no. of correspondences
     e = 0.5; %outlier ratio = no. of outliers/total no. points
              %              = 1- no. of inliers/total no. of points
     p = 0.99; %probability that a point is an inlier
     % N_iter = round(log10(1-p)/log10(1-(1-e)^k)); % no. of iterations
-    N_iter = 5;
+    N_iter = 1000;
     %distThreshold = sqrt(5.99*sigma) %sigma = expected uncertainty
     %inlierThreshold = 0
     %% Determination of Inliers
-    im1InlierCorrPts = [];
-    im2InlierCorrPts = [];
+    %matchedInliers = [];
     maxMatchedInliers = 0;
     for i = 1:N_iter
         %% Random sample
         % Randomly Select 5 unique point pairs
         randIndexes = getRandIndex(N_pts,5);
-        im1pts = matchedPointsIn1(randIndexes,:);
-        im2pts = matchedPointsIn2(randIndexes,:);
+        im1pts = matchedKP1(randIndexes);
+        im2pts = matchedKP2(randIndexes);
         
+        im1ptsCo = zeros(5,2);
+        im2ptsCo = zeros(5,2);
+        for j = 1:5
+            im1ptsCo(j,:) = im1pts{j}.Coordinates;
+            im2ptsCo(j,:) = im2pts{j}.Coordinates;
+        end
         % Compute Homography Matrix H
         H = h_matrix(im1pts,im2pts);
-        
-        figure;
-        tform = projective2d(H.');
-        imshow(imwarp(image2, tform), [])
+        [numInliers, inliers] = getInliers(im1ptsCo, im2ptsCo, H, threshold);
+        if (numInliers==5)
 
+            [numInliers2, inliers2] = getInliers(matchedKP1, matchedPointsIn2, H, threshold);
 
+            if (numInliers2 > maxMatchedInliers)
+                maxMatchedInliers = numInliers2
+                %matchedInliers = inliers;
+                bestH = H;
+                %bestIm1pts = im1pts;
+                %bestIm2pts = im2pts;
+            end
+        end
+    end
+    bestIm1pts = zeros(length(inliers2),2);
+    bestIm2pts = zeros(length(inliers2),2);
+    for i = 1: length(inliers2)
+        bestIm1pts(i,:) = matchedKP1(inliers2(i),:);
+        bestIm2pts(i,:) = matchedPointsIn2(inliers2(i),:);
+    end
+
+    figure; ax = axes;
+    showMatchedFeatures(image1,image2,bestIm1pts,bestIm2pts,'montage','Parent',ax);
+    title(ax, 'Candidate point matches');
+    legend(ax, 'Matched points 1','Matched points 2');
+
+%         figure;
+%         tform = projective2d(bestH.');
+%         imshow(imwarp(image2, tform), [])
 %         %Use H matrix to transform original image
 %         im1ptsForward = transformForward(img1_points,H);
 %         errorForward = sum((im1ptsForward-img2_points).^2,2).^0.5;
@@ -63,7 +92,5 @@ function A_ransac = RANSAC(matchedPointsIn1,matchedPointsIn2, image2)
 %             maxMatchedInliers = nMatchedInliers
 %             A_ransac_best = H;
 %         end
-    end
     %% Final Homography Estimation
-    A_ransac = estimateTransform(im1InlierCorrPts,im2InlierCorrPts);
 end
