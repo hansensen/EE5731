@@ -6,15 +6,11 @@ image1 = imread('../assg1/im01.jpg');
 image2 = imread('../assg1/im02.jpg');
 images = {image1, image2};
 imageSize = zeros(length(images),2);
-keypoints = cell(1,length(images));
 
 for i = 1:length(images)
     imageSize(i, :) = size(rgb2gray(images{i}));
-    figure;
-    imshow(images{i});
-    keypoints(i) = {ginput(4)};
-    close;
 end
+keypoints = selectKeyPoints(images, 4);
 
 H = h_matrix(keypoints{1}, keypoints{2});
 
