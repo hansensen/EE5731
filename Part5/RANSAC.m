@@ -15,8 +15,8 @@ function A_ransac = RANSAC(matchedPointsIn1,matchedPointsIn2, image2)
     maxMatchedInliers = 0;
     for i = 1:N_iter
         %% Random sample
-        % Randomly Select 5 point pairs
-        randIndexes = randi(N_pts,5,1);
+        % Randomly Select 5 unique point pairs
+        randIndexes = getRandIndex(N_pts,5);
         im1pts = matchedPointsIn1(randIndexes,:);
         im2pts = matchedPointsIn2(randIndexes,:);
         
