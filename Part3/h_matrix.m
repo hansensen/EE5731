@@ -1,7 +1,7 @@
 function H = h_matrix(keypoint1, keypoint2)
     % Construct Matrix A
     A = zeros(8, 9);
-    point_num = 4;
+    point_num = length(keypoint1);
     for i = 1 : point_num
         % Row i  : [x y 1 0 0 0 -x'x  -x'y  -x']
         % Row i+1: [0 0 0 x y 1 -y'x  -y'y  -y']
