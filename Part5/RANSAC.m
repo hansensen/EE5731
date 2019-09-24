@@ -1,4 +1,4 @@
-function bestH = RANSAC(matchedKP1,matchedKP2, image1, image2)   
+function H = RANSAC(matchedKP1,matchedKP2, image1, image2)   
     %% Determination of Inliers
     N_pts = length(matchedKP1); % total no. of points
     distThreshold = 10;
@@ -43,7 +43,7 @@ function bestH = RANSAC(matchedKP1,matchedKP2, image1, image2)
                 im2inliers(j,:) = fliplr(matchedKP2{bestMatchedInliers(j)}.Coordinates);
             end
             % Compute new model
-            H = h_matrix(im1inliers,im2inliers)
+            H = h_matrix(im1inliers,im2inliers);
 
     %% Plot the best matched points
     bestIm1pts = zeros(length(bestMatchedInliers),2);
