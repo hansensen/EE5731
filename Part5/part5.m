@@ -1,4 +1,4 @@
-%% Step 1 - Load images and manually select matched keypoints between images
+%% Step 1 - Load images and 
 
 clc;
 clear;
@@ -11,8 +11,10 @@ images = {image1, image2};
 image_size = zeros(length(images),2);
 keypoints = cell(1,length(images));
 
-keyPoints1 = SIFT(image1,5,5,1.6);
-keyPoints2 = SIFT(image2,5,5,1.6);
+keyPoints1 = SIFT(image1,3,5,1.3);
+keyPoints2 = SIFT(image2,3,5,1.3);
+
+%% Step 2: Find the best matched points
 matchedKP1 = keyPoints1;
 matchedKP2 = cell(length(keyPoints1));
 
@@ -38,22 +40,14 @@ end
 % figure;
 % imshow(uint8(image1Figure2));
 
-matchedPointsIn1 = zeros(length(keyPoints1),2);
-matchedPointsIn2 = zeros(length(keyPoints1),2);
-% Get matched points
-for i = 1 : length(keyPoints1)
-    matchedPointsIn1(i,1) = keyPoints1{i}.Coordinates(2);
-    matchedPointsIn1(i,2) = keyPoints1{i}.Coordinates(1);
-    matchedPointsIn2(i,1) = matchedKP2{i}.Coordinates(2);
-    matchedPointsIn2(i,2) = matchedKP2{i}.Coordinates(1);
-end
+[matchedPointsIn1, matchedPointsIn2] = getCoordinates(matchedKP1, matchedKP2);
 
-% Plot all the matches
+%% Plot all the matches
 figure; ax = axes;
 showMatchedFeatures(image1,image2,matchedPointsIn1,matchedPointsIn2,'montage','Parent',ax);
 title(ax, 'Candidate point matches');
 legend(ax, 'Matched points 1','Matched points 2');
 
-%% Step 2 - Get the Best Homography Matrix Using RANSAC
+%% Step 3 - Get the Best Homography Matrix Using RANSAC
 
-H_RANSAC = RANSAC(matchedKP1, matchedKP2, image1, image2);
+%H_RANSAC = RANSAC(matchedKP1, matchedKP2, image1, image2);

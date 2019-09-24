@@ -1,9 +1,9 @@
-function [numInliers, inliers] = getInliers(matchedPointsIn1, matchedPointsIn2, H, threshold)
+function [numInliers, inliers] = getInliers(im1ptsCo, im2ptsCo, H, threshold)
     inliers = [];
-    transformedPoints = transform(matchedPointsIn2, H);
+    transformedPoints = transform(im2ptsCo, H);
     numInliers = 0;
-    for i = 1:length(matchedPointsIn1)
-        if sqrt(sum((transformedPoints(i,:) - matchedPointsIn1(i,:)).^2)) < threshold
+    for i = 1:length(im1ptsCo)
+        if sqrt(sum((transformedPoints(i,:) - im1ptsCo(i,:)).^2)) < threshold
             numInliers = numInliers+1;
             inliers(numInliers) = i;
         end
