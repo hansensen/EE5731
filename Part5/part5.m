@@ -5,14 +5,15 @@ clear;
 
 addpath('../Part3')
 addpath('../Part2')
-image1 = double(rgb2gray(imread('../assg1/im01.jpg')));
-image2 = double(rgb2gray(imread('../assg1/im02.jpg')));
+image1 = imread('../assg1/im01.jpg');
+image2 = imread('../assg1/im02.jpg');
 images = {image1, image2};
 imageSize = zeros(length(images),2);
-keypoints = cell(1,length(images));
-
-keyPoints1 = SIFT(image1,3,5,1.3);
-keyPoints2 = SIFT(image2,3,5,1.3);
+for i = 1:length(images)
+    imageSize(i, :) = size(rgb2gray(images{i}));
+end
+keyPoints1 = SIFT(double(rgb2gray(image1)),3,5,1.6);
+keyPoints2 = SIFT(double(rgb2gray(image2)),3,5,1.6);
 
 %% Step 2: Find the best matched points
 matchedKP1 = keyPoints1;
@@ -52,11 +53,11 @@ legend(ax, 'Matched points 1','Matched points 2');
 
 H = RANSAC(matchedKP1, matchedKP2, image1, image2);
 
-
 tforms(length(images)) = projective2d(eye(3));
 tforms(2) = projective2d(H.');
 
 %% Step 4 - Compute the output limits and create the corresponding panaroma
+%% Step 3 - Compute the output limits and create the corresponding panaroma
 
 % Compute the output limits  for each transform
 for i = 1:length(tforms)
@@ -79,11 +80,10 @@ width  = round(xMax - xMin);
 height = round(yMax - yMin);
 
 % Initialize the "empty" panorama.
-panorama = zeros([height width], 'like', images{1});
+panorama = zeros([height width 3], 'like', images{1});
 
-% blender = vision.AlphaBlender('Operation', 'Binary mask', ...
-%     'MaskSource', 'Input port');  
-blender = vision.AlphaBlender;
+blender = vision.AlphaBlender('Operation', 'Binary mask', ...
+    'MaskSource', 'Input port');  
 
 % Create a 2-D spatial reference object defining the size of the panorama
 xLimits = [xMin xMax];
@@ -102,8 +102,8 @@ for i = 1:length(images)
     mask = imwarp(true(size(I,1),size(I,2)), tforms(i), 'OutputView', panoramaView);
     
     % Overlay the warpedImage onto the panorama.
-    % panorama = step(blender, panorama, warpedImage, mask);
-    panorama = step(blender, panorama, warpedImage);
+    panorama = step(blender, panorama, warpedImage, mask);
+    %panorama = step(blender, panorama, warpedImage);
 end
 
 figure
