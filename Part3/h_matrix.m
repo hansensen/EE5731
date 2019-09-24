@@ -20,7 +20,11 @@ function H = h_matrix(keypoint1, keypoint2)
     end
 
     % Decompose matrix A using SVD
-    [~,~,V] = svd(A);
+    if point_num == 4
+        [~,~,V] = svd(A);
+    else
+        [~,~,V] = svd(A, 'econ');
+    end
     h = V(:, end)';
     H = zeros(3, 3);
 
