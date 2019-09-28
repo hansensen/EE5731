@@ -1,18 +1,14 @@
-rgbImage = imread('image.jpg');
+rgbImage = imread('../assg1/im01.jpg');
 
-sobel_kernel = [1 0 -1; 2 0 -2; 1 0 -1];
+sobel_kernel = [-1 0 1; -2 0 2; -1 0 1];
 gaussian_kernel = [1 2 1; 2 4 2; 1 2 1];
 
-kernel = sobel(3)
-redChannel = rgbImage(:, :, 1);
-greenChannel = rgbImage(:, :, 2);
-blueChannel = rgbImage(:, :, 3);
-filteredImageR = convo(redChannel, kernel);
-filteredImageG = convo(greenChannel, kernel);
-filteredImageB = convo(blueChannel, kernel);
+kernel = sobel(5);
 
-filteredImage(:, :, 1) = filteredImageR;
-filteredImage(:, :, 2) = filteredImageG;
-filteredImage(:, :, 3) = filteredImageB;
+kernel = [1 -1;-1 1]
+kernel = [-1 1 -1]
+kernel = [-1; 1; -1]
 
-imshow(filteredImage, [])
+image = convo(double(rgb2gray(rgbImage)), kernel);
+
+imshow(image, [])
