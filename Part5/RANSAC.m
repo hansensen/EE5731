@@ -2,7 +2,7 @@ function bestH = RANSAC(matchedKP1,matchedKP2, image1, image2)
     %% Determination of Inliers
     N_pts = length(matchedKP1); % total no. of points
     distThreshold = 5;
-    N_iter = 30000;
+    N_iter = 40000;
     bestMatchedInliers = [];
     maxInliers = 0;
     for i = 1:N_iter
