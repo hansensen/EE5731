@@ -6,7 +6,7 @@ function bestH = RANSAC(matchedKP1,matchedKP2, image1, image2)
     bestMatchedInliers = [];
     maxInliers = 0;
     currentError = 1.e1000;
-    while (maxInliers < 80 && N_iter < 500000)
+    while (maxInliers/N_pts < 0.1 && N_iter < 500000)
         N_iter = N_iter + 1;
         %% Random sample
         % Randomly Select 5 unique point pairs
