@@ -1,14 +1,16 @@
 function bestH = RANSAC(matchedKP1,matchedKP2, image1, image2)   
     %% Determination of Inliers
     N_pts = length(matchedKP1); % total no. of points
-    distThreshold = 5;
-    N_iter = 40000;
+    distThreshold = 6;
+    N_iter = 0;
     bestMatchedInliers = [];
     maxInliers = 0;
-    for i = 1:N_iter
+    currentError = 1.e1000;
+    while (maxInliers<60)
+        N_iter = N_iter + 1;
         %% Random sample
         % Randomly Select 5 unique point pairs
-        randIndexes = getRandIndex(N_pts,5);
+        randIndexes = getRandIndex(N_pts,9);
         im1pts = matchedKP1(randIndexes);
         im2pts = matchedKP2(randIndexes);
 
@@ -23,11 +25,14 @@ function bestH = RANSAC(matchedKP1,matchedKP2, image1, image2)
 
         % Count number of inliers using H
         [matchedPointsIn1, matchedPointsIn2] = getCoordinates(matchedKP1, matchedKP2);
-        [numInliers, matchedInliers] = getInliers(matchedPointsIn1, matchedPointsIn2, H, distThreshold);
+        [numInliers, matchedInliers, error] = getInliers(matchedPointsIn1, matchedPointsIn2, H, distThreshold);
 
-        if (numInliers > maxInliers)
-            maxInliers = numInliers;
-            bestMatchedInliers = matchedInliers;
+        if (numInliers >= maxInliers)
+            if (numInliers > maxInliers || error < currentError)
+                maxInliers = numInliers;
+                bestMatchedInliers = matchedInliers;
+                currentError = error;
+            end
         end
     end
 
@@ -41,12 +46,9 @@ function bestH = RANSAC(matchedKP1,matchedKP2, image1, image2)
 
     figure; ax = axes;
     showMatchedFeatures(image1,image2,bestIm1pts,bestIm2pts,'montage','Parent',ax);
-    title(ax, 'Candidate point matches');
+    title(ax, strcat('Candidate point matches,  ',int2str(maxInliers)));
     legend(ax, 'Matched points 1','Matched points 2');
 
     %% Calculate New H matrix
-    bestH = h_matrix(bestIm1pts,bestIm2pts);
-    figure;
-    tform = projective2d(bestH.');
-    imshow(imwarp(image2, tform), [])
+     bestH = h_matrix(bestIm1pts,bestIm2pts);
 end
