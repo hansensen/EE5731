@@ -57,7 +57,6 @@ tforms(length(images)) = projective2d(eye(3));
 tforms(2) = projective2d(H.');
 
 %% Step 4 - Compute the output limits and create the corresponding panaroma
-%% Step 3 - Compute the output limits and create the corresponding panaroma
 
 % Compute the output limits  for each transform
 for i = 1:length(tforms)
