@@ -40,12 +40,12 @@ function bestH = RANSAC(matchedKP1,matchedKP2)
     end
 
     %% Plot the best matched points
-%     bestIm1pts = zeros(length(bestMatchedInliers),2);
-%     bestIm2pts = zeros(length(bestMatchedInliers),2);
-%     for j = 1: length(bestMatchedInliers)
-%         bestIm1pts(j,:) = fliplr(matchedKP1{bestMatchedInliers(j)}.Coordinates);
-%         bestIm2pts(j,:) = fliplr(matchedKP2{bestMatchedInliers(j)}.Coordinates);
-%     end
+    bestIm1pts = zeros(length(bestMatchedInliers),2);
+    bestIm2pts = zeros(length(bestMatchedInliers),2);
+    for j = 1: length(bestMatchedInliers)
+        bestIm1pts(j,:) = fliplr(matchedKP1{bestMatchedInliers(j)}.Coordinates);
+        bestIm2pts(j,:) = fliplr(matchedKP2{bestMatchedInliers(j)}.Coordinates);
+    end
 %
 %     figure; ax = axes;
 %     showMatchedFeatures(image1,image2,bestIm1pts,bestIm2pts,'montage','Parent',ax);
