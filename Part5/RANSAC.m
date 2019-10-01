@@ -11,7 +11,7 @@ function bestH = RANSAC(matchedKP1,matchedKP2, image1, image2)
         %% Random sample
         % Randomly Select 5 unique point pairs
         numPts = 5;
-        randIndexes = getRandIndex(N_pts,numPts);
+        randIndexes = getRandIndex(N_pts, numPts);
         im1pts = matchedKP1(randIndexes);
         im2pts = matchedKP2(randIndexes);
 
@@ -24,6 +24,7 @@ function bestH = RANSAC(matchedKP1,matchedKP2, image1, image2)
         %% Compute Homography Matrix H and Get Inliers
         H = h_matrix(im1ptsCo,im2ptsCo);
         [numInliers, ~, ~] = getInliers(im1ptsCo, im2ptsCo, H, distThreshold);
+        % Only continue if all 5 points are inliers
         if (numInliers == numPts)
             % Count number of inliers using H
             [matchedPointsIn1, matchedPointsIn2] = getCoordinates(matchedKP1, matchedKP2);
@@ -50,7 +51,7 @@ function bestH = RANSAC(matchedKP1,matchedKP2, image1, image2)
         bestIm1pts(j,:) = fliplr(matchedKP1{bestMatchedInliers(j)}.Coordinates);
         bestIm2pts(j,:) = fliplr(matchedKP2{bestMatchedInliers(j)}.Coordinates);
     end
-%
+
     figure; ax = axes;
     showMatchedFeatures(image1,image2,bestIm1pts,bestIm2pts,'montage','Parent',ax);
     title(ax, strcat('Candidate point matches,  ',int2str(maxInliers)));
