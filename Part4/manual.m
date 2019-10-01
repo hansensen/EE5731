@@ -42,8 +42,6 @@ height = round(yMax - yMin);
 % Initialize the "empty" panorama.
 panorama = zeros([height width 3], 'like', images{1});
 
-blender = vision.AlphaBlender('Operation', 'Binary mask', ...
-    'MaskSource', 'Input port');  
 blender = vision.AlphaBlender;
 
 % Create a 2-D spatial reference object defining the size of the panorama
@@ -58,10 +56,10 @@ for i = 1:length(images)
    
     % Transform I into the panorama.
     warpedImage = imwarp(I, tforms(i), 'OutputView', panoramaView);
-                  
+
     % Generate a binary mask.    
     mask = imwarp(true(size(I,1),size(I,2)), tforms(i), 'OutputView', panoramaView);
-    
+
     % Overlay the warpedImage onto the panorama.
     % panorama = step(blender, panorama, warpedImage, mask);
     panorama = step(blender, panorama, warpedImage);
