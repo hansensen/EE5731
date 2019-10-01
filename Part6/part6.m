@@ -30,10 +30,6 @@ end
 
 disp('Got all tforms')
 
-%% 2. Get tform matrix
-tformsMatrix(length(images)) = projective2d(eye(3));
-tformsMatrix(2) = getTform(image1, image2);
-
 %% 3. Calculate the size of the result image
 % calculate the output limits  for each transform
 for i = 1:length(tformsMatrix)
