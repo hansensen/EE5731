@@ -1,5 +1,5 @@
 
-image = imread('../assgn/im01.jpg');
+image = imread('../assg1/im01.jpg');
 image = double(rgb2gray(image));
 
 keyPoints = SIFT(image,5,5,1.6);
