@@ -1,3 +1,4 @@
+%% 1. Load images and select keypoint
 clc;
 clear;
 
@@ -12,58 +13,52 @@ for i = 1:length(images)
 end
 keypoints = selectKeyPoints(images, 4);
 
+%% 2. Find calculate Homography matrix and get tform matrices
 H = h_matrix(keypoints{1}, keypoints{2});
 
-tforms(length(images)) = projective2d(eye(3));
-tforms(2) = projective2d(H.');
+% First tform matrix should simply be identity matrix
+tformsMatrix(length(images)) = projective2d(eye(3));
+% second tform matrix should be homography matrix
+tformsMatrix(2) = projective2d(H.');
 
-%% Step 3 - Compute the output limits and create the corresponding panaroma
-
-% Compute the output limits  for each transform
-for i = 1:length(tforms)
+%% 3. Calculate the size of the result image
+% calculate the output limits  for each transform
+for i = 1:length(tformsMatrix)
     % [xLimitsOut,yLimitsOut] = outputLimits(tform,xLimitsIn,yLimitsIn)
-    [xlim(i,:), ylim(i,:)] = outputLimits(tforms(i), [1 imageSize(i, 2)], [1 imageSize(i, 1)]);    
+    [xOutputLimit(i,:), yOutputLimit(i,:)] = outputLimits(tformsMatrix(i), [1 imageSize(i, 2)], [1 imageSize(i, 1)]);    
 end
-
 
 maxImageSize = max(imageSize);
 
-% Find the minimum and maximum output limits 
-xMin = min([1; xlim(:)]);
-xMax = max([maxImageSize(2); xlim(:)]);
+% get the width and height according to the output limits
+width  = round(max([maxImageSize(2); xOutputLimit(:)]) - min([1; xOutputLimit(:)]));
+height = round(max([maxImageSize(1); yOutputLimit(:)]) - min([1; yOutputLimit(:)]));
 
-yMin = min([1; ylim(:)]);
-yMax = max([maxImageSize(1); ylim(:)]);
+% initialise a result with image1
+result = zeros([height width 3], 'like', images{1});
 
-% Width and height of panorama.
-width  = round(xMax - xMin);
-height = round(yMax - yMin);
-
-% Initialize the "empty" panorama.
-panorama = zeros([height width 3], 'like', images{1});
-
+% Get default blender
 blender = vision.AlphaBlender;
 
-% Create a 2-D spatial reference object defining the size of the panorama
-xLimits = [xMin xMax];
-yLimits = [yMin yMax];
-panoramaView = imref2d([height width], xLimits, yLimits);
+% Define the pararama view size
+resultView = imref2d([height width], ...
+          [min([1; xOutputLimit(:)]) max([maxImageSize(2); xOutputLimit(:)])], ...
+          [min([1; yOutputLimit(:)]) max([maxImageSize(1); yOutputLimit(:)])]);
 
-% Create the panorama.
-for i = 1:length(images)
-    
-    I = images{i};
-   
-    % Transform I into the panorama.
-    warpedImage = imwarp(I, tforms(i), 'OutputView', panoramaView);
+%% 4. Stitch the images and show the result
+for i = 1:2
+    % get current image
+    image = images{i};
+
+    % transform images to image1 view using tform matrix
+    warpedImage = imwarp(image, tformsMatrix(i), 'OutputView', resultView);
 
     % Generate a binary mask.    
-    mask = imwarp(true(size(I,1),size(I,2)), tforms(i), 'OutputView', panoramaView);
+    mask = imwarp(true(size(image,1),size(image,2)), tformsMatrix(i), 'OutputView', resultView);
 
-    % Overlay the warpedImage onto the panorama.
-    % panorama = step(blender, panorama, warpedImage, mask);
-    panorama = step(blender, panorama, warpedImage);
+    % Stitch them together
+    result = step(blender, result, warpedImage);
 end
 
 figure
-imshow(panorama)
+imshow(result)
