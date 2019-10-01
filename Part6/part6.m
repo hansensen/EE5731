@@ -24,9 +24,12 @@ tforms(length(images)) = projective2d(eye(3));
 %%
 
 for i = 2:length(images)
+    disp(['Getting tform of image ' num2str(i)])
     tforms(i) = getTform(images{i-1}, images{i});
     tforms(i).T = tforms(i).T * tforms(i-1).T; 
 end
+
+disp('Got all tforms')
 
 for i = 1:length(tforms)
     [xlim(i,:), ylim(i,:)] = outputLimits(tforms(i), [1 imageSize(i,2)], [1 imageSize(i,1)]);    
