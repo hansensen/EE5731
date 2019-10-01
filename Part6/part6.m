@@ -41,38 +41,21 @@ for i = 1:length(tformsMatrix)
     [xOutputLimit(i,:), yOutputLimit(i,:)] = outputLimits(tformsMatrix(i), [1 imageSize(i, 2)], [1 imageSize(i, 1)]);    
 end
 
-%%
-% Next, compute the average X limits for each transforms and find the image
-% that is in the center. Only the X limits are used here because the scene
-% is known to be horizontal. If another set of images are used, both the X
-% and Y limits may need to be used to find the center image.
-
 %% 4. Find the centre image
+% get outputlimit average and sort
+[~, index] = sort(mean(xOutputLimit, 2));
+% the median is the base image
+baseIndex = index(floor((numel(tformsMatrix)+1)/2));
 
-avgXLim = mean(xOutputLimit, 2);
-
-[~, idx] = sort(avgXLim);
-
-centerIdx = floor((numel(tformsMatrix)+1)/2);
-
-centerImageIdx = idx(centerIdx);
-
-%%
-% Finally, apply the center image's inverse transform to all the others.
-
-Tinv = invert(tformsMatrix(centerImageIdx));
-
+%% 5. Transform all the H matrix w.r.t to base image
+% get the invert of base image's h matrix
+invertMatrix = invert(tformsMatrix(baseIndex));
+% change all transform matrix accordingly
 for i = 1:length(tformsMatrix)
-    tformsMatrix(i).T = tformsMatrix(i).T * Tinv.T;
+    tformsMatrix(i).T = tformsMatrix(i).T * invertMatrix.T;
 end
 
 %% Step 3 - Initialize the Panorama
-% Now, create an initial, empty, panorama into which all the images are
-% mapped.
-%
-% Use the |outputLimits| method to compute the minimum and maximum output
-% limits over all transformations. These values are used to automatically
-% compute the size of the panorama.
 
 % Compute the output limits  for each transform
 for i = 1:length(tformsMatrix)
