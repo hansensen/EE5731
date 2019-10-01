@@ -53,53 +53,47 @@ end
 
 %% Step 3 - Initialize the Panorama
 
-% Compute the output limits  for each transform
+%% 3. Calculate the size of the result image
+% calculate the output limits  for each transform
 for i = 1:length(tformsMatrix)
     % [xLimitsOut,yLimitsOut] = outputLimits(tform,xLimitsIn,yLimitsIn)
-    [xlim(i,:), ylim(i,:)] = outputLimits(tformsMatrix(i), [1 imageSize(i, 2)], [1 imageSize(i, 1)]);
+    [xOutputLimit(i,:), yOutputLimit(i,:)] = outputLimits(tformsMatrix(i), [1 imageSize(i, 2)], [1 imageSize(i, 1)]);    
 end
 
 maxImageSize = max(imageSize);
 
-% Find the minimum and maximum output limits
-xMin = min([1; xlim(:)]);
-xMax = max([maxImageSize(2); xlim(:)]);
+% get the width and height according to the output limits
+width  = round(max([maxImageSize(2); xOutputLimit(:)]) - min([1; xOutputLimit(:)]));
+height = round(max([maxImageSize(1); yOutputLimit(:)]) - min([1; yOutputLimit(:)]));
 
-yMin = min([1; ylim(:)]);
-yMax = max([maxImageSize(1); ylim(:)]);
-
-% Width and height of panorama.
-width  = round(xMax - xMin);
-height = round(yMax - yMin);
-
-% Initialize the "empty" panorama.
-panorama = zeros([height width 3], 'like', images{1});
+% initialise a result with image1
+result = zeros([height width 3], 'like', images{1});
 
 blender = vision.AlphaBlender('Operation', 'Binary mask', ...
     'MaskSource', 'Input port');
 
-% Create a 2-D spatial reference object defining the size of the panorama
-xLimits = [xMin xMax];
-yLimits = [yMin yMax];
-panoramaView = imref2d([height width], xLimits, yLimits);
+% Define the pararama view size
+resultView = imref2d([height width], ...
+          [min([1; xOutputLimit(:)]) max([maxImageSize(2); xOutputLimit(:)])], ...
+          [min([1; yOutputLimit(:)]) max([maxImageSize(1); yOutputLimit(:)])]);
 
-% Create the panorama.
+%% 4. Stitch the images and show the result
 for i = 1:length(images)
+    % get current image
+    image = images{i};
 
-    I = images{i};
+    % transform images to image1 view using tform matrix
+    warpedImage = imwarp(image, tformsMatrix(i), 'OutputView', resultView);
 
-    % Transform I into the panorama.
-    warpedImage = imwarp(I, tformsMatrix(i), 'OutputView', panoramaView);
+    % Generate a binary mask.    
+    mask = imwarp(true(size(image,1),size(image,2)), tformsMatrix(i), 'OutputView', resultView);
 
-    % Generate a binary mask.
-    mask = imwarp(true(size(I,1),size(I,2)), tformsMatrix(i), 'OutputView', panoramaView);
+    % Stitch them together
 
     % Overlay the warpedImage onto the panorama.
-    panorama = step(blender, panorama, warpedImage, mask);
-    %panorama = step(blender, panorama, warpedImage);
+    result = step(blender, result, warpedImage, mask);
 end
 
 
-%%
 figure
-imshow(panorama)
+imshow(result)
