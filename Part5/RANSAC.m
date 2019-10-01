@@ -52,7 +52,8 @@ function bestH = RANSAC(matchedKP1,matchedKP2, image1, image2)
         bestIm2pts(j,:) = fliplr(matchedKP2{bestMatchedInliers(j)}.Coordinates);
     end
 
-    figure; ax = axes;
+    figure;
+    ax = axes;
     showMatchedFeatures(image1,image2,bestIm1pts,bestIm2pts,'montage','Parent',ax);
     title(ax, strcat('Candidate point matches,  ',int2str(maxInliers)));
     legend(ax, 'Matched points 1','Matched points 2');
