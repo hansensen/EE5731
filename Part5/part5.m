@@ -2,7 +2,6 @@
 clc;
 clear;
 
-
 addpath('../Part3')
 addpath('../Part2')
 image1 = imread('../assg1/im01.jpg');

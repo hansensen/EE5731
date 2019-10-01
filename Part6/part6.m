@@ -1,7 +1,6 @@
-%%
+%% 1. Load image
 clc;
 clear;
-
 
 addpath('../Part2')
 addpath('../Part3')
@@ -19,20 +18,27 @@ for i = 1:length(images)
     imageSize(i, :) = size(rgb2gray(images{i}));
 end
 
-%%
-tforms(length(images)) = projective2d(eye(3));
-%%
+%% 2. Get tform matrix
+% tforms matrics
+tformsMatrix(length(images)) = projective2d(eye(3));
 
 for i = 2:length(images)
     disp(['Getting tform of image ' num2str(i)])
-    tforms(i) = getTform(images{i-1}, images{i});
-    tforms(i).T = tforms(i).T * tforms(i-1).T; 
+    tformsMatrix(i) = getTform(images{i-1}, images{i});
+    tformsMatrix(i).T = tformsMatrix(i).T * tformsMatrix(i-1).T; 
 end
 
 disp('Got all tforms')
 
-for i = 1:length(tforms)
-    [xlim(i,:), ylim(i,:)] = outputLimits(tforms(i), [1 imageSize(i,2)], [1 imageSize(i,1)]);    
+%% 2. Get tform matrix
+tformsMatrix(length(images)) = projective2d(eye(3));
+tformsMatrix(2) = getTform(image1, image2);
+
+%% 3. Calculate the size of the result image
+% calculate the output limits  for each transform
+for i = 1:length(tformsMatrix)
+    % [xLimitsOut,yLimitsOut] = outputLimits(tform,xLimitsIn,yLimitsIn)
+    [xOutputLimit(i,:), yOutputLimit(i,:)] = outputLimits(tformsMatrix(i), [1 imageSize(i, 2)], [1 imageSize(i, 1)]);    
 end
 
 %%
@@ -41,21 +47,23 @@ end
 % is known to be horizontal. If another set of images are used, both the X
 % and Y limits may need to be used to find the center image.
 
-avgXLim = mean(xlim, 2);
+%% 4. Find the centre image
+
+avgXLim = mean(xOutputLimit, 2);
 
 [~, idx] = sort(avgXLim);
 
-centerIdx = floor((numel(tforms)+1)/2);
+centerIdx = floor((numel(tformsMatrix)+1)/2);
 
 centerImageIdx = idx(centerIdx);
 
 %%
 % Finally, apply the center image's inverse transform to all the others.
 
-Tinv = invert(tforms(centerImageIdx));
+Tinv = invert(tformsMatrix(centerImageIdx));
 
-for i = 1:length(tforms)
-    tforms(i).T = tforms(i).T * Tinv.T;
+for i = 1:length(tformsMatrix)
+    tformsMatrix(i).T = tformsMatrix(i).T * Tinv.T;
 end
 
 %% Step 3 - Initialize the Panorama
@@ -67,9 +75,9 @@ end
 % compute the size of the panorama.
 
 % Compute the output limits  for each transform
-for i = 1:length(tforms)
+for i = 1:length(tformsMatrix)
     % [xLimitsOut,yLimitsOut] = outputLimits(tform,xLimitsIn,yLimitsIn)
-    [xlim(i,:), ylim(i,:)] = outputLimits(tforms(i), [1 imageSize(i, 2)], [1 imageSize(i, 1)]);
+    [xlim(i,:), ylim(i,:)] = outputLimits(tformsMatrix(i), [1 imageSize(i, 2)], [1 imageSize(i, 1)]);
 end
 
 maxImageSize = max(imageSize);
@@ -102,10 +110,10 @@ for i = 1:length(images)
     I = images{i};
 
     % Transform I into the panorama.
-    warpedImage = imwarp(I, tforms(i), 'OutputView', panoramaView);
+    warpedImage = imwarp(I, tformsMatrix(i), 'OutputView', panoramaView);
 
     % Generate a binary mask.
-    mask = imwarp(true(size(I,1),size(I,2)), tforms(i), 'OutputView', panoramaView);
+    mask = imwarp(true(size(I,1),size(I,2)), tformsMatrix(i), 'OutputView', panoramaView);
 
     % Overlay the warpedImage onto the panorama.
     panorama = step(blender, panorama, warpedImage, mask);
