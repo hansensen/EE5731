@@ -29,7 +29,7 @@ function tform = getTform(image1, image2)
     legend(ax, 'Matched points 1','Matched points 2');
 
     %% Step 3 - Get the Best Homography Matrix Using RANSAC
-    H = RANSAC(matchedKP1, matchedKP2);
+    H = RANSAC(matchedKP1, matchedKP2, image1, image2);
 
     tform = projective2d(H.');
 
