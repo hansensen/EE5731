@@ -1,4 +1,4 @@
-function bestH = RANSAC(matchedKP1,matchedKP2)
+function bestH = RANSAC(matchedKP1,matchedKP2, image1, image2)
     %% Determination of Inliers
     N_pts = length(matchedKP1); % total no. of points
     distThreshold = 5;
@@ -6,7 +6,7 @@ function bestH = RANSAC(matchedKP1,matchedKP2)
     bestMatchedInliers = [];
     maxInliers = 0;
     currentError = 1.e1000;
-    while (maxInliers/N_pts < 0.1 && N_iter < 500000)
+    while (maxInliers/N_pts < 0.3 && N_iter < 500000)
         N_iter = N_iter + 1;
         %% Random sample
         % Randomly Select 5 unique point pairs
@@ -39,6 +39,10 @@ function bestH = RANSAC(matchedKP1,matchedKP2)
         end
     end
 
+    disp(['total number of matched points ' int2str(N_pts)])
+    disp(['total number of iterations ' int2str(N_iter)])
+    disp(['RANSAC done with maxInliers: ' int2str(maxInliers)])
+
     %% Plot the best matched points
     bestIm1pts = zeros(length(bestMatchedInliers),2);
     bestIm2pts = zeros(length(bestMatchedInliers),2);
@@ -47,10 +51,10 @@ function bestH = RANSAC(matchedKP1,matchedKP2)
         bestIm2pts(j,:) = fliplr(matchedKP2{bestMatchedInliers(j)}.Coordinates);
     end
 %
-%     figure; ax = axes;
-%     showMatchedFeatures(image1,image2,bestIm1pts,bestIm2pts,'montage','Parent',ax);
-%     title(ax, strcat('Candidate point matches,  ',int2str(maxInliers)));
-%     legend(ax, 'Matched points 1','Matched points 2');
+    figure; ax = axes;
+    showMatchedFeatures(image1,image2,bestIm1pts,bestIm2pts,'montage','Parent',ax);
+    title(ax, strcat('Candidate point matches,  ',int2str(maxInliers)));
+    legend(ax, 'Matched points 1','Matched points 2');
 
     %% Calculate New H matrix
      bestH = h_matrix(bestIm1pts,bestIm2pts);
