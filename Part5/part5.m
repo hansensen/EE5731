@@ -5,8 +5,8 @@ clear;
 
 addpath('../Part3')
 addpath('../Part2')
-image1 = imread('../assg1/im03.jpg');
-image2 = imread('../assg1/im04.jpg');
+image1 = imread('../assg1/im01.jpg');
+image2 = imread('../assg1/im02.jpg');
 images = {image1, image2};
 imageSize = zeros(length(images),2);
 for i = 1:length(images)
