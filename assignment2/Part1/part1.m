@@ -23,8 +23,6 @@ i = zeros(1, num_edges);
 j = zeros(1, num_edges);
 adjacent = zeros(1,num_edges);
 edge_index = 1;
-% pairwise = sparse(num_pixels,num_pixels);
-
 
 %%
 for row = 0:H-1
@@ -66,11 +64,6 @@ for row = 0:H-1
         adjacent(edge_index) = 1;
         edge_index = edge_index +1;
     end
-    
-%     if row+1 < H, pairwise(pixel_index, 1+col+(row+1)*W) = 1; end
-%     if row-1 >= 0, pairwise(pixel_index, 1+col+(row-1)*W) = 1; end 
-%     if col+1 < W, pairwise(pixel_index, 1+(col+1)+row*W) = 1; end
-%     if col-1 >= 0, pairwise(pixel_index, 1+(col-1)+row*W) = 1; end 
 
     % prior term: end
   end
@@ -80,8 +73,8 @@ end
 adjacent = adjacent *m_lambda;
 pairwise = sparse(i,j ,adjacent);
 [labels E Eafter] = GCMex(segclass, single(unary), pairwise, single(labelcost),1);
-fprintf('E: %d (should be 260), Eafter: %d (should be 44)\n', E, Eafter);
-fprintf('unique(labels) should be [0 4] and is: [');
+fprintf('E: %d , Eafter: %d \n', E, Eafter);
+fprintf('unique(labels) should be [0 1] and is: [');
 fprintf('%d ', unique(labels));
 fprintf(']\n');
 
