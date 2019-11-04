@@ -16,7 +16,8 @@ num_classes = 2;
 segclass = zeros(num_pixels, 1);
 unary = zeros(num_classes, num_pixels);
 [X Y] = meshgrid(1:num_classes, 1:num_classes);
-labelcost = min(4, (X - Y).*(X - Y));
+% labelcost = min(4, (X - Y).*(X - Y));
+labelcost = [0 0.1; 0.1 0]
 
 num_edges = H * (W -1) + W * (H - 1);
 i = zeros(1, num_edges);
@@ -25,17 +26,21 @@ adjacent = zeros(1,num_edges);
 edge_index = 1;
 % pairwise = sparse(num_pixels,num_pixels);
 
+img_reshape = reshape(rgbImage, [num_pixels, 3]);
+unary(2,:) = mean(abs(double(img_reshape) - SOURCE_COLOR), 2);
+unary(1,:) = mean(abs(double(img_reshape) - SINK_COLOR), 2);
+unary = unary/5;
 
-%%
+%
 for row = 0:H-1
   for col = 0:W-1
     pixel_index = 1+ row * W + col;
-    
+
     % data term:
-    pixel = reshape(rgbImage(row+1, col+1,:),[1,3]);
-    unary(2, pixel_index) = getDistance(pixel, SOURCE_COLOR);
-    unary(1, pixel_index) = getDistance(pixel, SINK_COLOR);
-    
+%     pixel = reshape(rgbImage(row+1, col+1,:),[1,3]);
+%     unary(2, pixel_index) = getDistance(pixel, SINK_COLOR);
+%     unary(1, pixel_index) = getDistance(pixel, SOURCE_COLOR);
+
     % prior term: start
     currentPixel = reshape(rgbImage(row+1, col+1,:),[1,3]);
 
@@ -86,7 +91,7 @@ fprintf('%d ', unique(labels));
 fprintf(']\n');
 
 %%
-labels = reshape(labels, W, H)';
+labels = reshape(labels, H, W);
 
 final_img = [];
 SOURCE_COLOR = [ 0, 0, 255 ]; % blue = foreground
