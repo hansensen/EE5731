@@ -1,6 +1,5 @@
 .DS_Store
 Books/
 Notes/
-*.png
 *.m~
 .ipynb_checkpoints/
