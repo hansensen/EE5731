@@ -2,3 +2,5 @@
 Books/
 Notes/
 *.png
+*.m~
+.ipynb_checkpoints/
