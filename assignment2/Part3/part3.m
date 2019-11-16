@@ -35,9 +35,9 @@ img2 = reshape(im2,1,[],3);
 
 % set parameters
 % disparity = 0.001:0.001:0.06;
-disparity = 0.001:0.001:0.01;
-Eps = 40; 
-Ws = 30/(disparity(end) - disparity(1));
+disparity = 0.001:0.001:0.02;
+Eps = 50; 
+Ws = 20/(disparity(end) - disparity(1));
 
 sigma_c = 10;
 num_classes = size(disparity,2);
@@ -69,7 +69,7 @@ unary = sqrt(sum((img2 - img1).^2,3));
 
 % calculate sparse matrix
 connected_pixels = get_connected_pixels(W, H);
-lambda = get_lambda(connected_pixels, Eps, Ws, num_pixels, im1);
+lambda = get_lambda(connected_pixels, Eps, Ws, im1);
 PAIRWISE = sparse(connected_pixels(:,1),connected_pixels(:,2), double(lambda),num_pixels,num_pixels,4*num_pixels);
 
 % calculate labelcost
@@ -93,7 +93,7 @@ addpath('../GCMex')
 [DispClass, Einit, Eafter] = GCMex(segclass, single(unary), PAIRWISE, single(Labelcost));
 
 %%
-Depth = reshape(disparity(DispClass+1), W, H);
+depth_map = reshape(disparity(DispClass+1), W, H);
 figure
-imshow(mat2gray(Depth'))
+imshow(mat2gray(depth_map'))
 toc
