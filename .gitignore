@@ -3,3 +3,5 @@ Books/
 Notes/
 *.m~
 .ipynb_checkpoints/
+../GCMex
+*.jpg
