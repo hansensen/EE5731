@@ -26,7 +26,7 @@ rgbImage2 = reshape(rgbImage2,1,[],3);
 num_pixels = W * H;
 
 % set disparity range
-disparity = 4:60;
+disparity = 1:100;
 
 % set classes
 segclass = disparity(1) * ones(1,num_pixels);
@@ -68,7 +68,7 @@ greeen_dist = sqrt((green_img(src)-green_img(dist)).^2);
 blue_dist = sqrt((blue_img(src)-blue_img(dist)).^2);
 dist_matrix = red_dist + greeen_dist + blue_dist;
 
-lambda = 0.005;
+lambda = 0.5;
 
 pairwise = sparse(src, dist, double(dist_matrix),num_pixels, num_pixels, 4* num_pixels);
 unary = unary./max(unary(:));
@@ -84,4 +84,5 @@ result = mat2gray(reshape(depth_map, H, W));
 result = flip(result ,1);
 result = flip(result ,2);
 imshow(result)
+imwrite(result, 'part2_1_100_lambda_008.jpg')
 toc

@@ -1,7 +1,7 @@
 %%
 addpath('../GCMex')
 
-m_lambda = 100;
+m_lambda = 10;
 SOURCE_COLOR = [ 0, 0, 255 ]; % blue = foreground
 SINK_COLOR = [245, 210, 110 ]; % yellow = background
 
@@ -102,4 +102,5 @@ for row = 1:H
 end
 
 figure;
-imshow(uint8(final_img))
+imshow(uint8(final_img));
+imwrite(uint8(final_img), 'lambda_10.jpg');
